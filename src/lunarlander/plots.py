@@ -190,6 +190,59 @@ def gap_plot(best_by_algo, final_by_algo, out_path):
     return out_path
 
 
+def gap_slope_plot(best_by_algo, final_by_algo, out_path):
+    """Slope-Chart: je Seed eine Linie vom besten zum finalen Modell.
+
+    Trägt drei Aussagen in einem Bild, die der Balken-Gap verliert: die Streuung
+    über die Seeds (die Startpunkte), die Überlappung der Algorithmen und den
+    Verfall bis Trainingsende (die Steigung). Die Paarung bleibt sichtbar — man
+    sieht, *welcher* Seed abstürzt, nicht nur den Mittelwert.
+
+    Args:
+        best_by_algo, final_by_algo: Dicts `{algo: array_je_seed}` — gleiche
+            Reihenfolge der Seeds in beiden, damit die Linien richtig paaren.
+        out_path: Ziel-PNG.
+
+    Returns:
+        Path der gespeicherten PNG.
+
+    Raises:
+        ValueError: wenn ein Algorithmus in best/final unterschiedlich viele Seeds hat.
+    """
+    out_path = Path(out_path)
+    labels = list(best_by_algo.keys())
+    for k in labels:
+        if len(np.asarray(best_by_algo[k])) != len(np.asarray(final_by_algo[k])):
+            raise ValueError(
+                f"{k}: best hat {len(np.asarray(best_by_algo[k]))} Seeds, "
+                f"final {len(np.asarray(final_by_algo[k]))} — je Seed eine Linie nötig.")
+
+    fig, ax = plt.subplots(figsize=(6, 4))
+    for i, (k, color) in enumerate(zip(labels, SERIES)):
+        best = np.asarray(best_by_algo[k], float)
+        final = np.asarray(final_by_algo[k], float)
+        # Zwei x-Positionen je Algorithmus, Gruppen nebeneinander.
+        x = np.array([i * 2.0, i * 2.0 + 1.0])
+        for b, f in zip(best, final):
+            ax.plot(x, [b, f], color=color, alpha=0.7, lw=1.5, marker="o",
+                    markersize=5, markeredgecolor=INK, markeredgewidth=0.5)
+        ax.plot(x, [best.mean(), final.mean()], color=color, lw=3.5, marker="o",
+                markersize=9, markeredgecolor=INK, label=f"{k.upper()} (mean)", zorder=3)
+
+    ax.axhline(200, ls="--", color=SOLVED, lw=1.5, label="solved (200)")
+    ax.set_xticks([i * 2.0 + j for i in range(len(labels)) for j in (0, 1)])
+    ax.set_xticklabels(["best", "final"] * len(labels))
+    for i, k in enumerate(labels):   # Algo-Name unter das jeweilige Paar
+        ax.text(i * 2.0 + 0.5, -0.12, k.upper(), transform=ax.get_xaxis_transform(),
+                ha="center", va="top", color=INK, fontweight="bold")
+    ax.set_ylabel("Mean return (100 episodes)")
+    ax.legend(loc="lower left")
+    fig.tight_layout()
+    fig.savefig(out_path)
+    plt.close(fig)
+    return out_path
+
+
 def _build_mean_runs(rewards_by_label):
     """Baut die Balkenfigur „Mittelwert über N Durchläufe" (ohne zu speichern).
 

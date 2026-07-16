@@ -92,6 +92,20 @@ def test_gap_plot_saves(tmp_path):
     assert out.exists()
 
 
+def test_gap_slope_plot_saves(tmp_path):
+    best = {"dqn": np.array([227.0, 250.0, 242.0]), "ppo": np.array([255.0, 222.0, 262.0])}
+    final = {"dqn": np.array([95.0, 210.0, 150.0]), "ppo": np.array([240.0, 205.0, 250.0])}
+    out = plots.gap_slope_plot(best, final, tmp_path / "slope.png")
+    assert out.exists()
+
+
+def test_gap_slope_plot_rejects_mismatched_seed_counts(tmp_path):
+    # Je Seed eine Linie -> best und final müssen paarweise zusammenpassen.
+    with pytest.raises(ValueError):
+        plots.gap_slope_plot({"dqn": np.array([227.0, 250.0])},
+                             {"dqn": np.array([95.0])}, tmp_path / "slope2.png")
+
+
 def test_reward_histogram_saves(tmp_path):
     out = plots.reward_histogram(np.array([200.0, 210.0, 190.0, 205.0, 150.0]),
                                  tmp_path / "hist.png")
