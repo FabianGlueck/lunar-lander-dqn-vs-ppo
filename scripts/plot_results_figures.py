@@ -7,6 +7,9 @@
   Zufalls-Boden ohnehin.
 - `gap_slope` — je Seed eine Linie best → final. Trägt Seed-Streuung,
   Überlappung und Trainingsverfall in einem Bild.
+- `learning_curves_seeds` — Lernkurve mit je Seed einer dünnen Linie und
+  beschnittener y-Achse. Das reine Seed-Mittel versteckt die Einbrüche: die Seeds
+  kollabieren zu verschiedenen Zeitpunkten, gemittelt bleibt davon nur eine Delle.
 
 `best` kommt aus results/metrics/<algo>.csv (dieselbe Rechnung wie im Notebook:
 100 Episoden je Seed, Eval-Seed 10_000+s), `final` wird frisch ausgewertet.
@@ -54,11 +57,17 @@ def main() -> None:
         print(f"  {a.upper()}: {np.round(final[a], 1)}  -> {final[a].mean():.1f} ± {final[a].std(ddof=1):.1f}"
               f"   gelöst: {int((final[a] >= config.SOLVED_THRESHOLD).sum())}/{len(config.SEEDS)}")
 
+    verlaeufe = {a: [config.MODELS_DIR / f"{a}_seed{s}" / "evaluations.npz" for s in config.SEEDS]
+                 for a in ALGOS}
+
     # PNG für PowerPoint, PDF für den Druck — wie die übrigen Figuren.
     for endung in ("png", "pdf"):
         plots.comparison_plot(best, OUT / f"comparison_boxplot.{endung}", show_points=True)
         plots.gap_slope_plot(best, final, OUT / f"gap_slope.{endung}")
-    print(f"\nGeschrieben: {OUT}/comparison_boxplot.{{png,pdf}} und gap_slope.{{png,pdf}}")
+        plots.learning_curve(verlaeufe, OUT / f"learning_curves_seeds.{endung}",
+                             baseline=-120, show_seeds=True, ylim=(-250, 320))
+    print(f"\nGeschrieben nach {OUT}:")
+    print("  comparison_boxplot.{png,pdf}, gap_slope.{png,pdf}, learning_curves_seeds.{png,pdf}")
 
 
 if __name__ == "__main__":

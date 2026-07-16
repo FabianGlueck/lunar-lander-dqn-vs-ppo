@@ -34,7 +34,8 @@ plt.rcParams.update({
 })
 
 
-def _build_learning_curve(history_paths, baseline=None, mark_best_checkpoints=False):
+def _build_learning_curve(history_paths, baseline=None, mark_best_checkpoints=False,
+                          show_seeds=False, ylim=None):
     """Baut die Lernkurven-Figur (ohne zu speichern) und gibt (fig, ax) zurück.
 
     Als eigene Funktion herausgezogen, damit sich die Achse in Tests inspizieren
@@ -46,6 +47,13 @@ def _build_learning_curve(history_paths, baseline=None, mark_best_checkpoints=Fa
             (z. B. der gemessene Zufalls-Boden). None = keine Linie.
         mark_best_checkpoints: Markiert für jeden Seed den Evaluationspunkt, an
             dem die gemittelte Kurve ihr Maximum erreicht.
+        show_seeds: zeichnet zusätzlich je Seed eine dünne Linie. Nötig, um
+            Einbrüche einzelner Seeds sichtbar zu machen: die Seeds kollabieren zu
+            *verschiedenen* Zeitpunkten, das Mittel glättet das zu einer harmlosen
+            Delle weg.
+        ylim: optionales `(min, max)` für die y-Achse. Ohne Beschneidung ziehen die
+            ersten Eval-Punkte (noch zufällige Netze) die Achse weit nach unten und
+            quetschen den interessanten Bereich zusammen.
     """
     fig, ax = plt.subplots(figsize=(7, 4))
     for algo, paths in history_paths.items():
@@ -59,9 +67,16 @@ def _build_learning_curve(history_paths, baseline=None, mark_best_checkpoints=Fa
         stacked = np.vstack(per_seed_means)
         mean = stacked.mean(axis=0)   # Mittel über die Seeds
         std = stacked.std(axis=0)     # Streuung über die Seeds (Unsicherheitsband)
-        line, = ax.plot(timesteps, mean, lw=2, label=algo.upper())
-        ax.fill_between(timesteps, mean - std, mean + std, alpha=0.18,
-                        color=line.get_color())   # Band in Linienfarbe
+        line, = ax.plot(timesteps, mean, lw=2.5, label=algo.upper(), zorder=3)
+        if show_seeds:
+            # Die Einzel-Linien *sind* die Streuung — ein Band daneben wäre dieselbe
+            # Information doppelt und würde die Figur zumatschen.
+            for seed_mean in stacked:
+                ax.plot(timesteps, seed_mean, lw=0.7, alpha=0.4,
+                        color=line.get_color(), zorder=1)
+        else:
+            ax.fill_between(timesteps, mean - std, mean + std, alpha=0.18,
+                            color=line.get_color())   # Band in Linienfarbe
         if mark_best_checkpoints:
             best_index = mean.argmax()
             ax.scatter(timesteps[best_index], mean[best_index],
@@ -74,12 +89,15 @@ def _build_learning_curve(history_paths, baseline=None, mark_best_checkpoints=Fa
                    label=f"random baseline ({baseline:.0f})")
     ax.set_xlabel("Timesteps")
     ax.set_ylabel("Mean eval return")
+    if ylim is not None:
+        ax.set_ylim(*ylim)
     ax.legend()
     fig.tight_layout()
     return fig, ax
 
 
-def learning_curve(history_paths, out_path, baseline=None, mark_best_checkpoints=False):
+def learning_curve(history_paths, out_path, baseline=None, mark_best_checkpoints=False,
+                   show_seeds=False, ylim=None):
     """Zeichnet die mittlere Eval-Rendite über die Steps (±Std-Band über Seeds).
 
     Args wie `_build_learning_curve`, plus `out_path` (Ziel-PNG).
@@ -89,7 +107,8 @@ def learning_curve(history_paths, out_path, baseline=None, mark_best_checkpoints
     """
     out_path = Path(out_path)
     fig, _ = _build_learning_curve(history_paths, baseline=baseline,
-                                   mark_best_checkpoints=mark_best_checkpoints)
+                                   mark_best_checkpoints=mark_best_checkpoints,
+                                   show_seeds=show_seeds, ylim=ylim)
     fig.savefig(out_path)
     plt.close(fig)
     return out_path

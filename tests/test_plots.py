@@ -51,6 +51,45 @@ def test_learning_curve_marks_best_mean_checkpoint_per_algorithm(tmp_path):
                for points in offsets)
 
 
+def test_learning_curve_show_seeds_draws_one_line_per_seed(tmp_path):
+    # Zwei Seeds -> zusätzlich zur Mittelwertlinie je Seed eine dünne Linie.
+    paths = {"dqn": [_make_npz(tmp_path / "d0.npz", 0), _make_npz(tmp_path / "d1.npz", 1)]}
+    fig_ohne, ax_ohne = plots._build_learning_curve(paths)
+    basis = len(ax_ohne.get_lines())
+    plt.close(fig_ohne)
+
+    fig, ax = plots._build_learning_curve(paths, show_seeds=True)
+    mit = len(ax.get_lines())
+    plt.close(fig)
+
+    assert mit == basis + 2
+
+
+def test_learning_curve_show_seeds_ersetzt_das_std_band(tmp_path):
+    # Die Einzel-Linien zeigen die Seed-Streuung bereits — das Band daneben wäre
+    # dieselbe Information ein zweites Mal und macht die Figur unlesbar.
+    paths = {"dqn": [_make_npz(tmp_path / "d0.npz", 0), _make_npz(tmp_path / "d1.npz", 1)]}
+
+    fig_ohne, ax_ohne = plots._build_learning_curve(paths)
+    baender_ohne = len(ax_ohne.collections)      # fill_between -> PolyCollection
+    plt.close(fig_ohne)
+
+    fig, ax = plots._build_learning_curve(paths, show_seeds=True)
+    baender_mit = len(ax.collections)
+    plt.close(fig)
+
+    assert baender_ohne == 1
+    assert baender_mit == 0
+
+
+def test_learning_curve_ylim_beschneidet_die_achse(tmp_path):
+    paths = {"dqn": [_make_npz(tmp_path / "d0.npz", 0)]}
+    fig, ax = plots._build_learning_curve(paths, ylim=(-250, 300))
+    grenzen = ax.get_ylim()
+    plt.close(fig)
+    assert grenzen == (-250, 300)
+
+
 def test_learning_curve_beschriftung_ist_englisch(tmp_path):
     paths = {"dqn": [_make_npz(tmp_path / "d0.npz", 0)]}
     fig, ax = plots._build_learning_curve(paths, baseline=-120)
