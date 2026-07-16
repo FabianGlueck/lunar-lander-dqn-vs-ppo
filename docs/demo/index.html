@@ -1,0 +1,259 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lunar Lander — 10 landings per policy</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; padding: 2rem clamp(1rem, 3vw, 3rem) 4rem;
+         background: #0c1018; color: #e7eaf3;
+         font: 16px/1.5 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+  header { display: flex; flex-wrap: wrap; gap: 1rem; align-items: baseline;
+            justify-content: space-between; border-bottom: 1px solid #3a4358;
+            padding-bottom: 1rem; margin-bottom: 2rem; }
+  h1 { font-size: 1.5rem; margin: 0; font-weight: 600; }
+  header p { margin: .25rem 0 0; color: #9aa4bd; font-size: .9rem; }
+  button { background: #1e2637; color: #e7eaf3;
+            border: 1px solid #3a4358; border-radius: 6px;
+            padding: .5rem 1rem; font-size: .9rem; cursor: pointer; }
+  button:hover { border-color: #e7eaf3; }
+  section { margin-bottom: 2.5rem; }
+  h2 { font-size: 1.1rem; font-weight: 600; margin: 0 0 .75rem;
+        display: flex; align-items: center; gap: .5rem; flex-wrap: wrap; }
+  .dot { width: .7rem; height: .7rem; border-radius: 50%; background: var(--accent); }
+  h2 small { color: #9aa4bd; font-weight: 400; font-size: .85rem; }
+  .grid { display: grid; gap: .7rem; grid-template-columns: repeat(5, 1fr); }
+  @media (max-width: 900px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+  .tile { margin: 0; background: #0a0e15; border: 1px solid #1e2637;
+           border-radius: 8px; overflow: hidden; }
+  .tile.crash { border-color: #3a4358; }
+  .tile img { display: block; width: 100%; height: auto; }
+  figcaption { display: flex; align-items: center; gap: .4rem;
+                padding: .5rem .6rem; font-size: .85rem; }
+  .ep { color: #6b7590; }
+  .score { margin-left: auto; font-variant-numeric: tabular-nums; font-weight: 600; }
+  .badge { font-size: .7rem; padding: .15rem .4rem; border-radius: 3px;
+            text-transform: uppercase; letter-spacing: .03em; }
+  .badge.landed { background: #14361f; color: #79d18f; }
+  .badge.crash { background: #3b1a17; color: #ef8377; }
+  .badge.timeout { background: #3a3115; color: #d9b04e; }
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>Lunar Lander — 10 landings per policy</h1>
+    <p>Best model per algorithm, eval seed 12345 · the same episodes shown in the poster
+       bar chart · 6.4 s loop, in sync</p>
+  </div>
+  <button id="restart">Restart all (R)</button>
+</header>
+
+    <section style="--accent:#0a9fb0">
+      <h2><span class="dot"></span>DQN
+        <small>best_model, seed 2 · 219.1 ± 96.8 · 2 crashes</small></h2>
+      <div class="grid">
+        <figure class="tile landed">
+          <img src="dqn_00.gif" alt="DQN Episode 1">
+          <figcaption><span class="ep">#1</span>
+            <span class="score">295</span>
+            <span class="badge landed">landed</span></figcaption>
+        </figure>
+        <figure class="tile landed">
+          <img src="dqn_01.gif" alt="DQN Episode 2">
+          <figcaption><span class="ep">#2</span>
+            <span class="score">295</span>
+            <span class="badge landed">landed</span></figcaption>
+        </figure>
+        <figure class="tile landed">
+          <img src="dqn_02.gif" alt="DQN Episode 3">
+          <figcaption><span class="ep">#3</span>
+            <span class="score">266</span>
+            <span class="badge landed">landed</span></figcaption>
+        </figure>
+        <figure class="tile landed">
+          <img src="dqn_03.gif" alt="DQN Episode 4">
+          <figcaption><span class="ep">#4</span>
+            <span class="score">264</span>
+            <span class="badge landed">landed</span></figcaption>
+        </figure>
+        <figure class="tile crash">
+          <img src="dqn_04.gif" alt="DQN Episode 5">
+          <figcaption><span class="ep">#5</span>
+            <span class="score">38</span>
+            <span class="badge crash">crash</span></figcaption>
+        </figure>
+        <figure class="tile landed">
+          <img src="dqn_05.gif" alt="DQN Episode 6">
+          <figcaption><span class="ep">#6</span>
+            <span class="score">271</span>
+            <span class="badge landed">landed</span></figcaption>
+        </figure>
+        <figure class="tile crash">
+          <img src="dqn_06.gif" alt="DQN Episode 7">
+          <figcaption><span class="ep">#7</span>
+            <span class="score">20</span>
+            <span class="badge crash">crash</span></figcaption>
+        </figure>
+        <figure class="tile landed">
+          <img src="dqn_07.gif" alt="DQN Episode 8">
+          <figcaption><span class="ep">#8</span>
+            <span class="score">263</span>
+            <span class="badge landed">landed</span></figcaption>
+        </figure>
+        <figure class="tile landed">
+          <img src="dqn_08.gif" alt="DQN Episode 9">
+          <figcaption><span class="ep">#9</span>
+            <span class="score">244</span>
+            <span class="badge landed">landed</span></figcaption>
+        </figure>
+        <figure class="tile landed">
+          <img src="dqn_09.gif" alt="DQN Episode 10">
+          <figcaption><span class="ep">#10</span>
+            <span class="score">235</span>
+            <span class="badge landed">landed</span></figcaption>
+        </figure></div>
+    </section>
+    <section style="--accent:#7d54d6">
+      <h2><span class="dot"></span>PPO
+        <small>best_model, seed 4 · 266.9 ± 12.6 · no crashes</small></h2>
+      <div class="grid">
+        <figure class="tile landed">
+          <img src="ppo_00.gif" alt="PPO Episode 1">
+          <figcaption><span class="ep">#1</span>
+            <span class="score">284</span>
+            <span class="badge landed">landed</span></figcaption>
+        </figure>
+        <figure class="tile landed">
+          <img src="ppo_01.gif" alt="PPO Episode 2">
+          <figcaption><span class="ep">#2</span>
+            <span class="score">259</span>
+            <span class="badge landed">landed</span></figcaption>
+        </figure>
+        <figure class="tile landed">
+          <img src="ppo_02.gif" alt="PPO Episode 3">
+          <figcaption><span class="ep">#3</span>
+            <span class="score">291</span>
+            <span class="badge landed">landed</span></figcaption>
+        </figure>
+        <figure class="tile landed">
+          <img src="ppo_03.gif" alt="PPO Episode 4">
+          <figcaption><span class="ep">#4</span>
+            <span class="score">252</span>
+            <span class="badge landed">landed</span></figcaption>
+        </figure>
+        <figure class="tile landed">
+          <img src="ppo_04.gif" alt="PPO Episode 5">
+          <figcaption><span class="ep">#5</span>
+            <span class="score">264</span>
+            <span class="badge landed">landed</span></figcaption>
+        </figure>
+        <figure class="tile landed">
+          <img src="ppo_05.gif" alt="PPO Episode 6">
+          <figcaption><span class="ep">#6</span>
+            <span class="score">268</span>
+            <span class="badge landed">landed</span></figcaption>
+        </figure>
+        <figure class="tile landed">
+          <img src="ppo_06.gif" alt="PPO Episode 7">
+          <figcaption><span class="ep">#7</span>
+            <span class="score">268</span>
+            <span class="badge landed">landed</span></figcaption>
+        </figure>
+        <figure class="tile landed">
+          <img src="ppo_07.gif" alt="PPO Episode 8">
+          <figcaption><span class="ep">#8</span>
+            <span class="score">266</span>
+            <span class="badge landed">landed</span></figcaption>
+        </figure>
+        <figure class="tile landed">
+          <img src="ppo_08.gif" alt="PPO Episode 9">
+          <figcaption><span class="ep">#9</span>
+            <span class="score">247</span>
+            <span class="badge landed">landed</span></figcaption>
+        </figure>
+        <figure class="tile landed">
+          <img src="ppo_09.gif" alt="PPO Episode 10">
+          <figcaption><span class="ep">#10</span>
+            <span class="score">272</span>
+            <span class="badge landed">landed</span></figcaption>
+        </figure></div>
+    </section>
+    <section style="--accent:#e0685a">
+      <h2><span class="dot"></span>Random
+        <small>uniform · -196.0 ± 93.4 · 10 crashes</small></h2>
+      <div class="grid">
+        <figure class="tile crash">
+          <img src="random_00.gif" alt="Random Episode 1">
+          <figcaption><span class="ep">#1</span>
+            <span class="score">-332</span>
+            <span class="badge crash">crash</span></figcaption>
+        </figure>
+        <figure class="tile crash">
+          <img src="random_01.gif" alt="Random Episode 2">
+          <figcaption><span class="ep">#2</span>
+            <span class="score">-109</span>
+            <span class="badge crash">crash</span></figcaption>
+        </figure>
+        <figure class="tile crash">
+          <img src="random_02.gif" alt="Random Episode 3">
+          <figcaption><span class="ep">#3</span>
+            <span class="score">-121</span>
+            <span class="badge crash">crash</span></figcaption>
+        </figure>
+        <figure class="tile crash">
+          <img src="random_03.gif" alt="Random Episode 4">
+          <figcaption><span class="ep">#4</span>
+            <span class="score">-76</span>
+            <span class="badge crash">crash</span></figcaption>
+        </figure>
+        <figure class="tile crash">
+          <img src="random_04.gif" alt="Random Episode 5">
+          <figcaption><span class="ep">#5</span>
+            <span class="score">-105</span>
+            <span class="badge crash">crash</span></figcaption>
+        </figure>
+        <figure class="tile crash">
+          <img src="random_05.gif" alt="Random Episode 6">
+          <figcaption><span class="ep">#6</span>
+            <span class="score">-227</span>
+            <span class="badge crash">crash</span></figcaption>
+        </figure>
+        <figure class="tile crash">
+          <img src="random_06.gif" alt="Random Episode 7">
+          <figcaption><span class="ep">#7</span>
+            <span class="score">-129</span>
+            <span class="badge crash">crash</span></figcaption>
+        </figure>
+        <figure class="tile crash">
+          <img src="random_07.gif" alt="Random Episode 8">
+          <figcaption><span class="ep">#8</span>
+            <span class="score">-323</span>
+            <span class="badge crash">crash</span></figcaption>
+        </figure>
+        <figure class="tile crash">
+          <img src="random_08.gif" alt="Random Episode 9">
+          <figcaption><span class="ep">#9</span>
+            <span class="score">-288</span>
+            <span class="badge crash">crash</span></figcaption>
+        </figure>
+        <figure class="tile crash">
+          <img src="random_09.gif" alt="Random Episode 10">
+          <figcaption><span class="ep">#10</span>
+            <span class="score">-250</span>
+            <span class="badge crash">crash</span></figcaption>
+        </figure></div>
+    </section>
+<script>
+  // GIFs neu laden = synchroner Neustart. Cache-Buster, sonst zeigt der Browser
+  // den laufenden Loop weiter.
+  const restart = () => document.querySelectorAll('img').forEach(img => {
+    const src = img.src.split('?')[0];
+    img.src = src + '?' + Date.now();
+  });
+  document.getElementById('restart').addEventListener('click', restart);
+  addEventListener('keydown', e => { if (e.key.toLowerCase() === 'r') restart(); });
+</script>
+</body>
+</html>

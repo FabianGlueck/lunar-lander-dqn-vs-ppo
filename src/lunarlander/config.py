@@ -25,11 +25,12 @@ FINAL_TIMESTEPS = 500_000      # volles Training für den finalen Vergleich
 # An den Repo-Root verankert, damit sie unabhängig vom Arbeitsverzeichnis
 # stimmen (z. B. auch aus einem Notebook heraus, das in notebooks/ läuft).
 _REPO_ROOT = Path(__file__).resolve().parents[2]
-RESULTS_DIR = _REPO_ROOT / "results"
+RESULTS_DIR = _REPO_ROOT / "results"     # Laufergebnisse — gitignored
 STUDIES_DIR = RESULTS_DIR / "studies"    # Optuna-SQLite-Studies (.db)
 MODELS_DIR = RESULTS_DIR / "models"      # gespeicherte Modelle + Eval-Logs
 METRICS_DIR = RESULTS_DIR / "metrics"    # finale Rewards pro Seed (.csv)
 TB_DIR = RESULTS_DIR / "tb"              # TensorBoard-Logs der finalen Läufe
+DOCS_DIR = _REPO_ROOT / "docs"           # eingecheckte Artefakte (Figuren, Demo-Seite)
 
 
 def ensure_dirs() -> None:
