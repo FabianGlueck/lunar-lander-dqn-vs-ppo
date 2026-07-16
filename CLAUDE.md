@@ -3,10 +3,10 @@
 Guidance for AI sessions working in this repo.
 
 ## Was dieses Repo ist
-Ein RL-Kurs-Repo. **Aktives Projekt:** eine Lunar-Lander-Pipeline, die **DQN vs. PPO**
-auf `LunarLander-v3` vergleicht (Tuning → Multi-Seed-Training → Signifikanztest, fürs Poster).
-Der Rest (PDFs, `01_TD_Learning_Notebooks/`, `03_SB3_example/`, Flappy-Bird u. a.) ist
-Kursmaterial — **nicht anfassen**, außer explizit gewünscht.
+Eine Lunar-Lander-Pipeline, die **DQN vs. PPO** auf `LunarLander-v3` vergleicht
+(Tuning → Multi-Seed-Training → Signifikanztest, fürs Poster). Entstanden aus einem
+RL-Kurs-Repo, jetzt eigenständig unter `FabianGlueck/lunar-lander-dqn-vs-ppo` —
+das Kursmaterial (PDFs, Flappy-Bird u. a.) ist hier **nicht** mehr enthalten.
 
 ## Kommunikation
 Der User schreibt Deutsch → **auf Deutsch antworten**. Code-Kommentare/Docstrings ebenfalls Deutsch.
@@ -19,6 +19,7 @@ uv run pytest -q                                     # Tests
 uv run python -m scripts.run_tuning --algo dqn --trials 30
 uv run python -m scripts.run_final_eval --algo dqn   # best_model (Default), --eval-only, --which {best,final}
 uv run tensorboard --logdir results/tb               # finale Läufe live
+uv run python -m scripts.render_demo --open          # Demo-Seite: 10 Landungen je Policy → docs/demo/
 ```
 
 ## Architektur (wichtig)
@@ -27,7 +28,8 @@ ist die **einzige** Stelle, die DQN/PPO kennt. **Keine Algo-Verzweigungen** in t
 einbauen — dort bleibt alles algo-blind, damit ein weiterer Algorithmus nur „reingesteckt" wird.
 
 Module: `config` (Konstanten/Pfade), `envs` (`make_env`), `agents`, `train`, `evaluate`, `stats`
-(Welch/CIs/Cohen's d), `plots`, `tune` (Optuna). `scripts/` = CLI für lange Läufe. `results/` = Output (gitignored).
+(Welch/CIs/Cohen's d), `plots`, `tune` (Optuna). `scripts/` = CLI für lange Läufe.
+`results/` = Laufergebnisse (**gitignored**), `docs/figures/` + `docs/demo/` = eingecheckte Artefakte.
 
 ## So arbeiten wir
 - **TDD immer** (superpowers:test-driven-development): erst den fehlschlagenden Test schreiben, RED sehen,
@@ -35,7 +37,7 @@ Module: `config` (Konstanten/Pfade), `envs` (`make_env`), `agents`, `train`, `ev
 - **Verifizieren vor „fertig":** Kommando ausführen und Output zeigen, nicht behaupten.
 - **Kleine, fokussierte Commits**, deutsche Commit-Bodies ok. Commit-Message endet mit dem
   `Co-Authored-By: Claude ...`-Trailer. Nur committen, wenn sinnvoll/gewünscht.
-- **Branch `feature/fabi`.** Nicht nach `main` mergen und keinen PR erstellen ohne Nachfrage.
+- **Es gibt nur `main`** — direkt darauf arbeiten. Pushen oder einen PR erstellen nur nach Nachfrage.
 - **Laufendes Training nicht stören:** keine schweren Trainings/große pytest-Läufe starten, während der
   User einen echten Lauf (CPU) fahren hat.
 
@@ -47,9 +49,10 @@ nutzen winzige Timesteps (≤ 2000), laufen in Sekunden. Bekanntes, harmloses Ra
 
 ## Doku-Landkarte
 - `docs/notes.md` — **lebende** Konzept-/Entscheidungs-Doku. Wenn ein Konzept geklärt wird → hier ergänzen.
+- `docs/poster-content.md` — paste-fertige Poster-Texte (Englisch) + Figuren-Zuordnung.
 - `docs/superpowers/specs/` & `plans/` — Design-Spec und Implementierungsplan.
 - `src/lunarlander/README.md` — Pipeline-Nutzung/Workflow.
-- Root `README.md` = **Kurs-Readme, NICHT überschreiben.**
+- Root `README.md` — die Projekt-README. Darf gepflegt werden, aber nicht ungefragt umschreiben.
 
 ## Zentrale Entscheidungen (Details in docs/notes.md)
 - **Metrik = `best_model`** (Early Stopping), nicht das finale Modell — DQN neigt am Ende zu
