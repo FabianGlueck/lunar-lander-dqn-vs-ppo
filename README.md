@@ -59,12 +59,28 @@ Requires [`uv`](https://docs.astral.sh/uv/) and Python 3.12.
 uv sync                                              # install dependencies
 uv run pytest -q                                     # run tests
 
+uv run python -m scripts.play                        # play it yourself (see below)
+
 uv run python -m scripts.run_tuning --algo dqn --trials 30   # hyperparameter search
 uv run python -m scripts.run_final_eval --algo dqn           # final training + eval
 uv run tensorboard --logdir results/tb                       # monitor final runs
 ```
 
 Analysis and poster figures are regenerated from `notebooks/03_analysis.ipynb`.
+
+### Fly it yourself
+
+```bash
+uv run python -m scripts.play              # random terrain
+uv run python -m scripts.play --seed 42    # fixed starting conditions
+```
+
+`←` `→` steer, `↑` or `space` fires the main engine, `R` restarts, `Esc` quits.
+
+This is not a simplified clone — it runs the same environment the agents train on, with the
+same `Discrete(4)` action space: **exactly one action per frame**. You cannot fire the main
+engine and a side thruster at the same time, and neither can DQN or PPO. That constraint is
+most of what makes the task hard.
 
 ## License / attribution
 

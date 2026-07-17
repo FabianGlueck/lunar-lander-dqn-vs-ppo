@@ -20,6 +20,8 @@ uv run python -m scripts.run_tuning --algo dqn --trials 30
 uv run python -m scripts.run_final_eval --algo dqn   # best_model (Default), --eval-only, --which {best,final}
 uv run tensorboard --logdir results/tb               # finale Läufe live
 uv run python -m scripts.render_demo --open          # Demo-Seite: 10 Landungen je Policy → docs/demo/
+uv run python -m scripts.plot_results_figures        # RESULTS-Figuren → docs/figures/
+uv run python -m scripts.play [--seed 42]            # selbst fliegen (dieselbe Env, Discrete(4))
 ```
 
 ## Architektur (wichtig)
